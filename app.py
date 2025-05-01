@@ -8,7 +8,7 @@ import json
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin requests from other origins
 
-df = pd.read_csv('THOR_Vietnam_Bombing_Operations.csv')    
+df = pd.read_csv('THOR_Vietnam_reduce.csv')    
 df.columns = df.columns.str.lower()
 df.rename(columns={
     'tgtlatdd_ddd_wgs84': 'target_lat',
