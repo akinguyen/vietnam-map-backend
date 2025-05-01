@@ -9,26 +9,7 @@ app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin requests from other origins
 CORS(app, resources={r"/filter": {"origins": "*"}})
 
-df = pd.read_csv('THOR_Vietnam_reduce.csv')    
-df.columns = df.columns.str.lower()
-df.rename(columns={
-    'tgtlatdd_ddd_wgs84': 'target_lat',
-    'tgtlonddd_ddd_wgs84': 'target_lon',
-    'msndate': 'missiondate',
-    'flthours': 'flighthours',
-    'mfunc': 'missiontypeid',
-    'mfunc_desc': 'missiontype',
-    'tgtcountry': 'target_country',
-    'tgtorigcoordsformat': 'target_origcoordsformat',
-    'tgtweather': 'target_weather'
-}, inplace=True)
-
-# Focus on year for time
-df['missionyear'] = pd.to_datetime(df['missiondate'], format='%Y-%m-%d', errors='coerce').dt.year.fillna(0).astype(int)
-
-# Drop unnecessary columns
-drop_cols = ['sourcerecord', 'tgttype', 'sourceid', 'numweaponsdelivered', 'timeontarget', 'numweaponsjettisoned', 'numweaponsreturned', 'mfunc_desc_class', 'additionalinfo', 'aircraft_original', 'aircraft_root', 'tgtcloudcover', 'tgtcontrol', 'tgtid', 'geozone', 'id' ,'weapontypeclass', 'missionid', 'numofacft', 'tgtid', 'releasefltspeed', 'airforcesqdn', 'airforcegroup', 'releasealtitude', 'resultsbda', 'callsign', 'releasealtitude', 'timeofftarget', 'releasefltspeed', 'tgtorigcoords']
-df.drop(columns=drop_cols, errors='ignore', inplace=True)
+df = pd.read_csv('reduce-bomb-data.csv')    
 
 location_data = []
 with open("combined_grant_final_v2.json", 'r', encoding="utf-8") as file:
@@ -104,7 +85,7 @@ def filter_data():
     missiontype = data.get('missiontype', ['STRIKE','CLOSE AIR SUPPORT','DIRECT AIR SUPPORT', 'AIR INTERDICTION'])
     missionyear = data.get('missionyear', [1965, 1966])
 
-    df_h3 = df.dropna(subset=['target_lat', 'target_lon'])
+    df_h3 = df.copy()
     df_h3 = df_h3[df_h3['missionyear'] != 0]
     df_h3 = df_h3[df_h3['missionyear'].isin(missionyear)]
     df_h3 = df_h3[df_h3['missiontype'].isin(missiontype)]
